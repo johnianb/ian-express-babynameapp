@@ -1,72 +1,35 @@
 
-const mongoose = require('mongoose');
-require('dotenv').config()
-
-mongoose.connect(process.env.MONGO_URI)
-  .then(connection => {
-    console.log('Connected to MongoDB')
-  })
-  .catch(error => {
-    console.log(error.message)
-  })
+const BabyName = require('../models/babySchema')
 
 const logger = (req, res, next) =>{
     console.log(req.method + ' ' + req.path + ' - ' + req.ip);
     next(); 
     }
 
-//SCHEMA
+const giveSuggestion = (req, res) => {
 
-const Schema = mongoose.Schema;
-
-  const babySchema = new Schema({
-    name:  { type: String,
-      required: true},
-    age: Number,
-    meaning: String,
-    reason: String
-  });
-
-// Model
-let BabyName = mongoose.model('BabyName', babySchema);
-
-// const done = () => {
-//   console.log('error')
-// }
-
-const askForName = (req, res) => {
-
-  let suggestedName = req.body.suggestedName;
+  let nameBoy = req.body.nameBoy;
+  let nameGirl = req.body.nameGirl;
+  let guess = req.body.guess;
+  let suggestedBy = req.body.suggestedBy;
   let age = req.body.age;
-  // res.send(req.params.version);
+  let meaning = req.body.meaning;
+  let reason = req.body.meaning;
+
   console.log(req.params);
 
-  let suggestion = new BabyName({ name: suggestedName, age: age,
-    meaning: 'God\'s messenger', reason: 'dad\'s name' });
+  let suggestion = new BabyName({ nameBoy: nameBoy, nameGirl: nameGirl, 
+    guess: guess, suggestedBy: suggestedBy, age: age,
+    meaning: meaning, reason: reason });
 
   suggestion.save((err) => {
-    if (err) return console.log(err);
+    if (err) 
+      return res.json(err);
     else {
       return res.json(suggestion)
     }
   });
 
-}
-
-const createAndSaveSuggestion = (req, res) => {
-  
-  let suggestedName = req.param('suggestedName');
-  let age = req.param('age');
-
-  let suggestion = new BabyName({ name: suggestedName, age: age,
-    meaning: 'God\'s messenger', reason: 'dad\'s name' });
-  // suggestion.save((err, data) => (err ? (err) : done(null, data)));
-  suggestion.save((err) => {
-    if (err) return console.log(err);
-    else {
-      return res.json(suggestion)
-    }
-  });
 }
 
 /** 4) Create many People with `Model.create()` */
@@ -158,8 +121,7 @@ var queryChain = function(done) {
 
 exports.logger = logger;
 exports.BabyName = BabyName;
-exports.createAndSaveSuggestion = createAndSaveSuggestion;
-exports.askForName = askForName;
+exports.giveSuggestion = giveSuggestion;
 exports.findPeopleByName = findPeopleByName;
 exports.findOneByFood = findOneByFood;
 exports.findPersonById = findPersonById;
